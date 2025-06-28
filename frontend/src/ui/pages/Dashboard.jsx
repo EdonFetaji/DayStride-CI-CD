@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import DashboardRepository from "../../repository/DashboardRepository";
+import DashboardRepository from "../../repository/DashBoardRepository";
 import {Loader} from "@mantine/core";
 import TodoInfoCard from "../components/todos/TodoInfoCard";
 import HabitInfoCard from "../components/habits/HabitInfoCard";

@@ -2,8 +2,11 @@
 
 import axios from "axios";
 
+// const BASE_URL = import.meta.env.VITE_BACKEND_HOST || "http://localhost:8080/api/"
+const BASE_URL = "/api/"
 const axiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE || "http://localhost:8000/api/",
+
+    baseURL: BASE_URL,
     headers: {
         "Content-Type": "application/json",
     },
@@ -41,7 +44,7 @@ axiosInstance.interceptors.response.use(
                     const {refresh} = JSON.parse(stored);
                     if (refresh) {
                         const res = await axios.post(
-                            `${import.meta.env.VITE_API_BASE || "http://localhost:8000/api/"}token/refresh/`,
+                            `${BASE_URL}token/refresh/`,
                             {refresh}
                         );
                         const newTokens = res.data;

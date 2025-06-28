@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import {IconPlus} from "@tabler/icons-react";
 
-import useGoal from "../../hooks/useGoal.js";
+import useGoal from "../../hooks/UseGoal.js";
 import GoalGrid from "../components/goals/GoalGrid.jsx";
 import EditGoalDialog from "../components/goals/EditGoalDialog.jsx";
 import DeleteGoalDialog from "../components/goals/DeleteGoalDialog.jsx";
