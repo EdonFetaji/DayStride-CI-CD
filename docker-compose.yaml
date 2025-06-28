@@ -13,10 +13,6 @@ services:
       timeout: 10s
       retries: 10
 
-  ubuntu:
-    image: edon505/ubuntu-qa
-    command: [ "tail", "-f", "/dev/null" ]
-
   backend:
     build:
       context: ./backend
