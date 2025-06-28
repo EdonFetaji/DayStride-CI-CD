@@ -1,4 +1,4 @@
-name: Django CI
+name: DayStride CI
 
 on:
   push:
@@ -9,6 +9,7 @@ on:
 jobs:
   unit-test:
     runs-on: ubuntu-latest
+    working-directory: ./backend
     steps:
       - uses: actions/checkout@v4
 
