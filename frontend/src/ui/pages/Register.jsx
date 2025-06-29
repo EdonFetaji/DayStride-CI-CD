@@ -1,5 +1,5 @@
-import {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import React, {useState} from 'react';
+import {Link, useNavigate} from 'react-router-dom';
 import api from '../../axios/axios';
 import logoIcon from "../../assests/logo.svg";
 
@@ -26,10 +26,10 @@ const Register = () => {
     return (
         <div className="min-h-screen flex items-center justify-center bg-amber-50 px-4">
             <div className="bg-white p-8 rounded-xl shadow-xl w-full max-w-md">
-                <div className="flex items-center justify-center gap-2 mb-6">
+                <Link className="flex items-center justify-center gap-2 mb-6" to={"/"}>
                     <img src={logoIcon} alt="Logo" width={40} height={40}/>
                     <span className="text-2xl font-bold text-black leading-none">DayStride</span>
-                </div>
+                </Link>
                 <h2 className="text-3xl font-bold text-amber-700 mb-6 text-center">Create Account</h2>
                 {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
                 <form onSubmit={handleSubmit} className="space-y-4">

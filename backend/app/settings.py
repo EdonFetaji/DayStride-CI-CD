@@ -73,14 +73,15 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'app.urls'
 
-if os.getenv("FRONTEND_HOST"):
+deploy_mode = os.getenv("FRONTEND_HOST", None)
+if deploy_mode is not None:
     CORS_ALLOWED_ORIGINS = [
 
         "http://" + os.getenv("FRONTEND_HOST") + ":" + os.getenv("FRONTEND_PORT", "80"),
     ]
 else:
     CORS_ALLOWED_ORIGINS = [
-        "http://localhost:80",
+        "http://localhost:5173",
     ]
 
 TEMPLATES = [
@@ -104,10 +105,18 @@ if 'test' in sys.argv:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': ':memory:',  # or 'test_db.sqlite3' if you prefer
+            'NAME': ':memory:',
+        }
+    }
+elif deploy_mode is None:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
 else:
+
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
@@ -118,7 +127,6 @@ else:
             'PORT': os.getenv("DB_PORT", "3306"),
         }
     }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

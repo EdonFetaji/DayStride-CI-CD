@@ -4,6 +4,7 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from datetime import date, timedelta
 
+
 class APICRUDTests(APITestCase):
     @classmethod
     def setUpTestData(cls):
@@ -163,3 +164,32 @@ class APICRUDTests(APITestCase):
         res = self.client.post('/api/habits/', payload, format='json')
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         return res.data
+
+    # ===== GOALS JOIN TEST =====
+    def test_15_goal_join(self):
+        # Create a goal to join
+        goal = self._create_goal()
+
+        payload = {
+            "goal": goal["id"]
+        }
+
+        res = self.client.post('/api/goals/join/', payload, format='json')
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertIn("detail", res.data)
+        self.assertEqual(res.data["detail"], "Goal successfully added to user.")
+
+    # ===== GOALS REMOVE TEST =====
+    def test_16_goal_remove(self):
+        # Create a goal and join it first
+        goal = self._create_goal()
+
+        # Join the goal
+        join_payload = {"goal": goal["id"]}
+        res = self.client.post('/api/goals/join/', join_payload, format='json')
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        # Now remove the goal
+        remove_payload = {"goal": goal["id"]}
+        res = self.client.post('/api/goals/remove/', remove_payload, format='json')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)

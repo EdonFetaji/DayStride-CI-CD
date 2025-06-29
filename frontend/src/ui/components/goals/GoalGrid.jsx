@@ -1,7 +1,7 @@
 import {SimpleGrid} from '@mantine/core';
 import GoalCard from './GoalCard.jsx';
 
-const GoalGrid = ({goals, onEdit, onDelete}) => {
+const GoalGrid = ({goals, onEdit, onDelete, onLeaveClick}) => {
     return (
         <SimpleGrid cols={3} spacing="md">
             {goals.map((goal) => (
@@ -10,6 +10,7 @@ const GoalGrid = ({goals, onEdit, onDelete}) => {
                     goal={goal}
                     onEditClick={onEdit}
                     onDeleteClick={onDelete}
+                    onLeaveClick={onLeaveClick}
                 />
             ))}
         </SimpleGrid>
