@@ -14,8 +14,7 @@ services:
       retries: 10
 
   backend:
-    build:
-      context: ./backend
+    image: edon505/daystride-backend:latest
 
     depends_on:
       db:
@@ -31,8 +30,7 @@ services:
       - DJANGO_DEBUG=True
 
   frontend:
-    build:
-      context: ./frontend
+    image: edon505/daystride-frontend:latest
     restart: on-failure:6
     environment:
       - VITE_BACKEND_HOST=http://backend:8080/api/
