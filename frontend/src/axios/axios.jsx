@@ -2,7 +2,7 @@
 
 import axios from "axios";
 
-// const BASE_URL = import.meta.env.VITE_BACKEND_HOST || "http://localhost:8080/api/"
+// const BASE_URL =  "http://localhost:8000/api/"
 const BASE_URL = "/api/"
 const axiosInstance = axios.create({
 

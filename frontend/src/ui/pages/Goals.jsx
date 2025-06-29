@@ -17,6 +17,7 @@ import EditGoalDialog from "../components/goals/EditGoalDialog.jsx";
 import DeleteGoalDialog from "../components/goals/DeleteGoalDialog.jsx";
 import AddGoalDialog from "../components/goals/AddGoalDialog.jsx";
 import GradientSegmentedControl from "../components/animations/SegmentedControl.jsx";
+import GoalRepository from "../../repository/GoalRepository.js";
 
 const Goals = () => {
     const {userGoals, loading, onAdd, onEdit, onDelete} = useGoal();
@@ -38,6 +39,18 @@ const Goals = () => {
         setSelectedGoal(goal);
         setDeleteOpen(true);
     };
+
+    const handleLeave = async (goal) => {
+        try {
+            await GoalRepository.leaveGoal(goal.id);
+            // Refetch or filter locally to remove the left goal
+            const updatedGoals = filteredGoals.filter(g => g.id !== goal.id);
+            setFilteredGoals(updatedGoals);
+        } catch (err) {
+            console.error("Failed to leave goal:", err);
+        }
+    };
+
 
     useEffect(() => {
         const now = new Date();
@@ -68,7 +81,7 @@ const Goals = () => {
             >
                 <Stack>
                     <section className="flex items-center justify-around">
-                        <h1  className="text-blue-700 text-2xl font-bold">
+                        <h1 className="text-blue-700 text-2xl font-bold">
                             My Goals
                         </h1>
                         <GradientSegmentedControl value={timeFilter} onChange={setTimeFilter}/>
@@ -92,6 +105,7 @@ const Goals = () => {
                             goals={filteredGoals}
                             onEdit={handleEditClick}
                             onDelete={handleDeleteClick}
+                            onLeaveClick={handleLeave}
                         />
                     )}
                 </Stack>

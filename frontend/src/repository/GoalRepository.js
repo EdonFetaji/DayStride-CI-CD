@@ -2,35 +2,44 @@
 import axiosInstance from "../axios/axios";
 
 const GoalRepository = {
-  findAllPublic: async () => {
-    // Default GET /goals/ → public goals only
-    return await axiosInstance.get("/goals/");
-  },
+    findAllPublic: async () => {
+        // Default GET /goals/ → public goals only
+        return await axiosInstance.get("/goals/");
+    },
 
-  findUserGoals: async () => {
-    // Custom GET /goals/my/ → authenticated user's goals
-    return await axiosInstance.get("/goals/my/");
-  },
+    findUserGoals: async () => {
+        // Custom GET /goals/my/ → authenticated user's goals
+        return await axiosInstance.get("/goals/my/");
+    },
 
-  findById: async (id) => {
-    return await axiosInstance.get(`/goals/${id}/`);
-  },
+    findById: async (id) => {
+        return await axiosInstance.get(`/goals/${id}/`);
+    },
 
-  create: async (data) => {
-    return await axiosInstance.post("/goals/", data);
-  },
+    joinGoal: async (id) => {
+        return await axiosInstance.post("/goals/join/", {goal: id});
+    },
 
-  update: async (id, data) => {
-    return await axiosInstance.put(`/goals/${id}/`, data);
-  },
+    leaveGoal: async (id) => {
+        return await axiosInstance.post("/goals/leave/", {goal: id});
+    },
 
-  partialUpdate: async (id, data) => {
-    return await axiosInstance.patch(`/goals/${id}/`, data);
-  },
 
-  delete: async (id) => {
-    return await axiosInstance.delete(`/goals/${id}/`);
-  },
+    create: async (data) => {
+        return await axiosInstance.post("/goals/", data);
+    },
+
+    update: async (id, data) => {
+        return await axiosInstance.put(`/goals/${id}/`, data);
+    },
+
+    partialUpdate: async (id, data) => {
+        return await axiosInstance.patch(`/goals/${id}/`, data);
+    },
+
+    delete: async (id) => {
+        return await axiosInstance.delete(`/goals/${id}/`);
+    },
 };
 
 export default GoalRepository;

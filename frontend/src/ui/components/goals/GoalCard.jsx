@@ -1,7 +1,7 @@
-import {Card, Text, Group, Badge, Button, Title, Stack} from '@mantine/core';
-import {IconEdit, IconTrash} from '@tabler/icons-react';
+import {Card, Text, Group, Badge, Button, Title} from '@mantine/core';
+import {IconEdit, IconTrash, IconLogout} from '@tabler/icons-react';
 
-const GoalCard = ({goal, onEditClick, onDeleteClick, sharedCount = 0}) => {
+const GoalCard = ({goal, onEditClick, onDeleteClick, onLeaveClick, sharedCount = 0}) => {
     return (
         <Card
             withBorder
@@ -14,7 +14,12 @@ const GoalCard = ({goal, onEditClick, onDeleteClick, sharedCount = 0}) => {
                 <Title order={4} className="text-blue-500 font-semibold">
                     {goal.name}
                 </Title>
-                {goal.is_public && (
+                {!goal.is_owner && (
+                    <Badge color="orange" variant="light" size="sm">
+                        Shared
+                    </Badge>
+                )}
+                {goal.is_public && goal.is_owner && (
                     <Badge color="green" variant="light" size="sm">
                         Public
                     </Badge>
@@ -38,37 +43,54 @@ const GoalCard = ({goal, onEditClick, onDeleteClick, sharedCount = 0}) => {
                 )}
             </Group>
 
-            {goal.is_public && (
+            {goal.is_public && goal.is_owner && (
                 <Text size="xs" color="dimmed" mb="sm">
                     Shared by {sharedCount} {sharedCount === 1 ? "user" : "users"}
                 </Text>
             )}
 
             <Group position="right" spacing="xs" mt="sm">
-                <Button
-                    variant="light"
-                    color="orange"
-                    radius="md"
-                    leftSection={<IconEdit size={16} />}
-                    onClick={() => onEditClick(goal)}
-                    styles={{
-                        root: { border: '1px solid #f59e0b', borderRadius: '0.5rem' },
-                    }}
-                >
-                    Edit
-                </Button>
-                <Button
-                    variant="light"
-                    color="red"
-                    radius="md"
-                    leftSection={<IconTrash size={16} />}
-                    onClick={() => onDeleteClick(goal)}
-                    styles={{
-                        root: { border: '1px solid #ef4444', borderRadius: '0.5rem' },
-                    }}
-                >
-                    Delete
-                </Button>
+                {goal.is_owner ? (
+                    <>
+                        <Button
+                            variant="light"
+                            color="orange"
+                            radius="md"
+                            leftSection={<IconEdit size={16}/>}
+                            onClick={() => onEditClick(goal)}
+                            styles={{
+                                root: {border: '1px solid #f59e0b', borderRadius: '0.5rem'},
+                            }}
+                        >
+                            Edit
+                        </Button>
+                        <Button
+                            variant="light"
+                            color="red"
+                            radius="md"
+                            leftSection={<IconTrash size={16}/>}
+                            onClick={() => onDeleteClick(goal)}
+                            styles={{
+                                root: {border: '1px solid #ef4444', borderRadius: '0.5rem'},
+                            }}
+                        >
+                            Delete
+                        </Button>
+                    </>
+                ) : (
+                    <Button
+                        variant="light"
+                        color="red"
+                        radius="md"
+                        leftSection={<IconLogout size={16}/>}
+                        onClick={() => onLeaveClick(goal)}
+                        styles={{
+                            root: {border: '1px solid #ef4444', borderRadius: '0.5rem'},
+                        }}
+                    >
+                        Leave
+                    </Button>
+                )}
             </Group>
         </Card>
     );
