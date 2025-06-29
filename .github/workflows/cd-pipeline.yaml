@@ -1,4 +1,4 @@
-name: EC2 Docker Deploy
+name: EC2 Docker-Compose Deploy
 
 on:
   workflow_dispatch: # manual trigger only
