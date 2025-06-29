@@ -191,5 +191,5 @@ class APICRUDTests(APITestCase):
 
         # Now remove the goal
         remove_payload = {"goal": goal["id"]}
-        res = self.client.post('/api/goals/remove/', remove_payload, format='json')
+        res = self.client.post('/api/goals/leave/', remove_payload, format='json')
         self.assertEqual(res.status_code, status.HTTP_200_OK)
