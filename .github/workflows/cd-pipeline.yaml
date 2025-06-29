@@ -85,9 +85,9 @@ jobs:
           echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ec2_key.pem
           chmod 600 ec2_key.pem
 
-      - name: Copy docker-compose.yml to EC2
+      - name: Copy docker-compose.yaml to EC2
         run: |
-          scp -i ec2_key.pem -o StrictHostKeyChecking=no docker-compose.yml ec2-user@${{ needs.aws_instance_prep.outputs.public_ip }}:/home/ec2-user/docker-compose.yml
+          scp -i ec2_key.pem -o StrictHostKeyChecking=no docker-compose.yaml ec2-user@${{ needs.aws_instance_prep.outputs.public_ip }}:/home/ec2-user/docker-compose.yml
 
       - name: Deploy with docker-compose
         env:
