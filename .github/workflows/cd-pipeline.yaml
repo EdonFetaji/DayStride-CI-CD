@@ -24,7 +24,7 @@ jobs:
         id: check_instance
         run: |
           INSTANCE_ID=$(aws ec2 describe-instances \
-            --filters "Name=tag:Name,Values=kiii-main" "Name=instance-state-name,Values=running" \
+            --filters "Name=tag:Name,Values=daystride-ec2" "Name=instance-state-name,Values=running" \
             --query "Reservations[0].Instances[0].InstanceId" \
             --output text)
 
@@ -40,7 +40,7 @@ jobs:
         run: |
           INSTANCE_ID=$(aws ec2 run-instances \
             --launch-template LaunchTemplateId=${{ secrets.EC2_LAUNCH_TEMPLATE_ID }} \
-            --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=kiii-main}]" \
+            --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=daystride-ec2}]" \
             --query 'Instances[0].InstanceId' \
             --output text)
           echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
