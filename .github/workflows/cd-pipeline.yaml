@@ -102,6 +102,7 @@ jobs:
             echo 'DB_NAME=${DB_NAME}' >> /home/ec2-user/.env &&
             echo 'DB_PORT=${DB_PORT}' >> /home/ec2-user/.env &&
             echo 'DB_PASSWORD=${DB_PASSWORD}' >> /home/ec2-user/.env &&
+            echo 'FRONTEND_HOST=${FRONTEND_HOST}' >> /home/ec2-user/.env &&
             cd /home/ec2-user &&
             docker-compose --env-file .env down || true &&
             docker-compose --env-file .env up -d
