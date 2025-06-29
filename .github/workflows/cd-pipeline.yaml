@@ -95,6 +95,7 @@ jobs:
           DB_NAME: ${{ secrets.DB_NAME }}
           DB_PORT: ${{ secrets.DB_PORT }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          FRONTEND_HOST: ${{ secrets.FRONTEND_HOST }}
         run: |
           ssh -i ec2_key.pem -o StrictHostKeyChecking=no ec2-user@${{ needs.aws_instance_prep.outputs.public_ip }} "
             echo 'DJANGO_SECRET=${DJANGO_SECRET}' > /home/ec2-user/.env &&
