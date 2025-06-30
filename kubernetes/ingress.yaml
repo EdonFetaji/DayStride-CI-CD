@@ -3,6 +3,8 @@ kind: Ingress
 
 metadata:
   name: daystride-ingress
+  namespace: daystride
+
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 
