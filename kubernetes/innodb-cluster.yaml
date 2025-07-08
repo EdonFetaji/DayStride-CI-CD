@@ -1,0 +1,16 @@
+apiVersion: mysql.oracle.com/v2
+kind: InnoDBCluster
+metadata:
+  name: daystride-mysql-cluster
+  namespace: db-daystride
+spec:
+  secretName: daystride-mysql-secret
+  instances: 3
+  router:
+    instances: 1
+  tlsUseSelfSigned: true
+
+  mycnf: |
+    [mysqld]
+    max_connections = 300
+    sql_mode=STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION

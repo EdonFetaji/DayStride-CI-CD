@@ -1,0 +1,252 @@
+Edon Fetaji@DESKTOP-HCQIG4A MINGW64 ~/Desktop/DayStride-CI-CD/kubernetes (feature)
+$ kubectl apply -f db-namespace.yaml
+kubectl apply -f mysql-secrets.yaml
+
+helm install mysql-operator mysql-operator/mysql-operator -n db-daystride
+
+kubectl apply -f innodb-cluster.yaml
+
+kubectl apply -f namespace.yaml
+kubectl apply -f secrets.yaml
+
+kubectl apply -f init-db-job.yaml
+
+kubectl apply -f backend.yaml
+kubectl apply -f frontend.yaml
+
+kubectl apply -f ingress.yaml
+namespace/db-daystride created
+secret/daystride-mysql-secret created
+NAME: mysql-operator
+LAST DEPLOYED: Tue Jul  8 02:16:55 2025
+NAMESPACE: db-daystride
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+Create an MySQL InnoDB Cluster by executing:
+1. When using a source distribution / git clone: `helm install [cluster-name] -n [ns-name] ~/helm/mysql-innodbcluster`
+2. When using the Helm repo from ArtifactHub
+2.1 With self signed certificates
+    export NAMESPACE="your-namespace"
+    # in case the namespace doesn't exist, please pass --create-namespace
+    helm install my-mysql-innodbcluster mysql-operator/mysql-innodbcluster -n $NAMESPACE \
+        --version 2.2.0 \
+        --set credentials.root.password=">-0URS4F3P4SS" \
+        --set tls.useSelfSigned=true
+
+2.2 When you have own CA and TLS certificates
+        export NAMESPACE="your-namespace"
+        export CLUSTER_NAME="my-mysql-innodbcluster"
+        export CA_SECRET="$CLUSTER_NAME-ca-secret"
+        export TLS_SECRET="$CLUSTER_NAME-tls-secret"
+        export ROUTER_TLS_SECRET="$CLUSTER_NAME-router-tls-secret"
+        # Path to ca.pem, server-cert.pem, server-key.pem, router-cert.pem and router-key.pem
+        export CERT_PATH="/path/to/your/ca_and_tls_certificates"
+
+        kubectl create namespace $NAMESPACE
+
+        kubectl create secret generic $CA_SECRET \
+            --namespace=$NAMESPACE --dry-run=client --save-config -o yaml \
+            --from-file=ca.pem=$CERT_PATH/ca.pem \
+        | kubectl apply -f -
+
+        kubectl create secret tls $TLS_SECRET \
+            --namespace=$NAMESPACE --dry-run=client --save-config -o yaml \
+            --cert=$CERT_PATH/server-cert.pem --key=$CERT_PATH/server-key.pem \
+        | kubectl apply -f -
+
+        kubectl create secret tls $ROUTER_TLS_SECRET \
+            --namespace=$NAMESPACE --dry-run=client --save-config -o yaml \
+            --cert=$CERT_PATH/router-cert.pem --key=$CERT_PATH/router-key.pem \
+        | kubectl apply -f -
+
+        helm install my-mysql-innodbcluster mysql-operator/mysql-innodbcluster -n $NAMESPACE \
+        --version 2.2.0 \
+        --set credentials.root.password=">-0URS4F3P4SS" \
+        --set tls.useSelfSigned=false \
+        --set tls.caSecretName=$CA_SECRET \
+        --set tls.serverCertAndPKsecretName=$TLS_SECRET \
+        --set tls.routerCertAndPKsecretName=$ROUTER_TLS_SECRET
+innodbcluster.mysql.oracle.com/daystride-mysql-cluster created
+namespace/daystride created
+secret/daystride-env-secret created
+job.batch/init-daystride-db created
+service/backend created
+deployment.apps/backend-deployment created
+service/frontend-service created
+deployment.apps/frontend-deployment created
+ingress.networking.k8s.io/daystride-ingress created
+
+Edon Fetaji@DESKTOP-HCQIG4A MINGW64 ~/Desktop/DayStride-CI-CD/kubernetes (feature)
+$ kubectl get pods --all-namespaces -w
+NAMESPACE      NAME                                      READY   STATUS              RESTARTS   AGE
+daystride      backend-deployment-58b66b97db-596h9       0/1     Init:0/1            0          13s
+daystride      backend-deployment-58b66b97db-dsrnk       0/1     Init:0/1            0          13s
+daystride      backend-deployment-58b66b97db-gfkcs       0/1     Init:0/1            0          13s
+daystride      backend-deployment-58b66b97db-kx77m       0/1     Init:0/1            0          13s
+daystride      backend-deployment-58b66b97db-szjr5       0/1     Init:0/1            0          13s
+daystride      frontend-deployment-b5db76fc-2xqm6        0/1     ContainerCreating   0          13s
+daystride      frontend-deployment-b5db76fc-4vzr6        0/1     ContainerCreating   0          13s
+daystride      frontend-deployment-b5db76fc-bg6jf        0/1     ContainerCreating   0          13s
+daystride      frontend-deployment-b5db76fc-j5l6n        0/1     ContainerCreating   0          13s
+daystride      frontend-deployment-b5db76fc-zl9sn        0/1     ContainerCreating   0          13s
+daystride      init-daystride-db-fskdg                   0/1     ContainerCreating   0          14s
+db-daystride   mysql-operator-6874549b6-jfnns            0/1     ContainerCreating   0          16s
+kube-system    coredns-ccb96694c-j8gdv                   1/1     Running             0          85s
+kube-system    helm-install-traefik-crd-krxs4            0/1     Completed           0          85s
+kube-system    helm-install-traefik-f5lsr                0/1     Completed           0          85s
+kube-system    local-path-provisioner-5cf85fd84d-pbctw   1/1     Running             0          85s
+kube-system    metrics-server-5985cbc9d7-prhgj           1/1     Running             0          85s
+kube-system    svclb-traefik-a9521f47-s5tt5              2/2     Running             0          32s
+kube-system    svclb-traefik-a9521f47-vzcdm              2/2     Running             0          32s
+kube-system    traefik-5d45fc8cc9-zl2sb                  1/1     Running             0          32s
+daystride      frontend-deployment-b5db76fc-zl9sn        1/1     Running             0          59s
+daystride      frontend-deployment-b5db76fc-2xqm6        1/1     Running             0          59s
+daystride      frontend-deployment-b5db76fc-4vzr6        1/1     Running             0          61s
+daystride      frontend-deployment-b5db76fc-j5l6n        1/1     Running             0          61s
+daystride      frontend-deployment-b5db76fc-bg6jf        1/1     Running             0          61s
+db-daystride   mysql-operator-6874549b6-jfnns            0/1     Running             0          114s
+db-daystride   daystride-mysql-cluster-0                 0/2     Pending             0          0s
+db-daystride   daystride-mysql-cluster-2                 0/2     Pending             0          0s
+db-daystride   daystride-mysql-cluster-1                 0/2     Pending             0          0s
+kube-system    helper-pod-create-pvc-fba0126a-e12f-49e0-8813-1028d0c6f60e   0/1     Pending             0          0s
+kube-system    helper-pod-create-pvc-71817f17-f8cf-4c67-aa71-e2f9cc3c42af   0/1     Pending             0          0s
+kube-system    helper-pod-create-pvc-8ed6d421-af25-4651-bd27-b81b47a28e65   0/1     Pending             0          0s
+kube-system    helper-pod-create-pvc-71817f17-f8cf-4c67-aa71-e2f9cc3c42af   0/1     ContainerCreating   0          0s
+kube-system    helper-pod-create-pvc-fba0126a-e12f-49e0-8813-1028d0c6f60e   0/1     ContainerCreating   0          0s
+kube-system    helper-pod-create-pvc-8ed6d421-af25-4651-bd27-b81b47a28e65   0/1     ContainerCreating   0          0s
+db-daystride   daystride-mysql-cluster-0                                    0/2     Pending             0          1s
+db-daystride   daystride-mysql-cluster-2                                    0/2     Pending             0          1s
+db-daystride   daystride-mysql-cluster-1                                    0/2     Pending             0          1s
+db-daystride   mysql-operator-6874549b6-jfnns                               1/1     Running             0          117s
+db-daystride   daystride-mysql-cluster-0                                    0/2     Pending             0          1s
+db-daystride   daystride-mysql-cluster-1                                    0/2     Pending             0          1s
+db-daystride   daystride-mysql-cluster-2                                    0/2     Pending             0          1s
+kube-system    helper-pod-create-pvc-8ed6d421-af25-4651-bd27-b81b47a28e65   1/1     Running             0          6s
+kube-system    helper-pod-create-pvc-fba0126a-e12f-49e0-8813-1028d0c6f60e   1/1     Running             0          6s
+kube-system    helper-pod-create-pvc-8ed6d421-af25-4651-bd27-b81b47a28e65   0/1     Completed           0          7s
+kube-system    helper-pod-create-pvc-fba0126a-e12f-49e0-8813-1028d0c6f60e   0/1     Completed           0          7s
+kube-system    helper-pod-create-pvc-71817f17-f8cf-4c67-aa71-e2f9cc3c42af   0/1     Completed           0          8s
+kube-system    helper-pod-create-pvc-8ed6d421-af25-4651-bd27-b81b47a28e65   0/1     Completed           0          9s
+kube-system    helper-pod-create-pvc-fba0126a-e12f-49e0-8813-1028d0c6f60e   0/1     Completed           0          9s
+kube-system    helper-pod-create-pvc-8ed6d421-af25-4651-bd27-b81b47a28e65   0/1     Completed           0          9s
+kube-system    helper-pod-create-pvc-8ed6d421-af25-4651-bd27-b81b47a28e65   0/1     Completed           0          9s
+kube-system    helper-pod-create-pvc-71817f17-f8cf-4c67-aa71-e2f9cc3c42af   0/1     Completed           0          9s
+db-daystride   daystride-mysql-cluster-0                                    0/2     Pending             0          10s
+db-daystride   daystride-mysql-cluster-0                                    0/2     Init:0/3            0          11s
+kube-system    helper-pod-create-pvc-71817f17-f8cf-4c67-aa71-e2f9cc3c42af   0/1     Completed           0          10s
+kube-system    helper-pod-create-pvc-71817f17-f8cf-4c67-aa71-e2f9cc3c42af   0/1     Completed           0          10s
+kube-system    helper-pod-create-pvc-fba0126a-e12f-49e0-8813-1028d0c6f60e   0/1     Completed           0          10s
+kube-system    helper-pod-create-pvc-fba0126a-e12f-49e0-8813-1028d0c6f60e   0/1     Completed           0          10s
+db-daystride   daystride-mysql-cluster-0                                    0/2     Init:1/3            0          11s
+db-daystride   daystride-mysql-cluster-1                                    0/2     Pending             0          12s
+db-daystride   daystride-mysql-cluster-2                                    0/2     Pending             0          12s
+db-daystride   daystride-mysql-cluster-1                                    0/2     Init:0/3            0          12s
+db-daystride   daystride-mysql-cluster-2                                    0/2     Init:0/3            0          12s
+db-daystride   daystride-mysql-cluster-1                                    0/2     Init:1/3            0          12s
+db-daystride   daystride-mysql-cluster-0                                    0/2     Init:1/3            0          12s
+db-daystride   daystride-mysql-cluster-1                                    0/2     Init:1/3            0          13s
+db-daystride   daystride-mysql-cluster-0                                    0/2     Init:2/3            0          14s
+db-daystride   daystride-mysql-cluster-1                                    0/2     Init:2/3            0          15s
+daystride      init-daystride-db-fskdg                                      1/1     Running             0          2m10s
+daystride      backend-deployment-58b66b97db-dsrnk                          0/1     Init:0/1            0          2m9s
+daystride      backend-deployment-58b66b97db-kx77m                          0/1     Init:0/1            0          2m9s
+db-daystride   daystride-mysql-cluster-0                                    0/2     Init:2/3            0          31s
+db-daystride   daystride-mysql-cluster-1                                    0/2     Init:2/3            0          31s
+db-daystride   daystride-mysql-cluster-2                                    0/2     Init:0/3            0          31s
+db-daystride   daystride-mysql-cluster-0                                    0/2     Init:2/3            0          31s
+db-daystride   daystride-mysql-cluster-2                                    0/2     Init:0/3            0          31s
+db-daystride   daystride-mysql-cluster-1                                    0/2     Init:2/3            0          31s
+daystride      backend-deployment-58b66b97db-gfkcs                          0/1     Init:0/1            0          2m30s
+daystride      backend-deployment-58b66b97db-szjr5                          0/1     Init:0/1            0          2m30s
+daystride      backend-deployment-58b66b97db-596h9                          0/1     Init:0/1            0          2m30s
+db-daystride   daystride-mysql-cluster-0                                    0/2     Init:2/3            0          61s
+db-daystride   daystride-mysql-cluster-0                                    0/2     Init:2/3            0          61s
+db-daystride   daystride-mysql-cluster-1                                    0/2     Init:2/3            0          61s
+db-daystride   daystride-mysql-cluster-2                                    0/2     Init:0/3            0          61s
+db-daystride   daystride-mysql-cluster-2                                    0/2     Init:0/3            0          62s
+db-daystride   daystride-mysql-cluster-1                                    0/2     Init:2/3            0          62s
+db-daystride   daystride-mysql-cluster-0                                    0/2     Init:2/3            0          91s
+db-daystride   daystride-mysql-cluster-0                                    0/2     Init:2/3            0          92s
+db-daystride   daystride-mysql-cluster-2                                    0/2     Init:0/3            0          92s
+db-daystride   daystride-mysql-cluster-1                                    0/2     Init:2/3            0          92s
+db-daystride   daystride-mysql-cluster-2                                    0/2     Init:0/3            0          92s
+db-daystride   daystride-mysql-cluster-1                                    0/2     Init:2/3            0          92s
+db-daystride   daystride-mysql-cluster-0                                    0/2     Init:2/3            0          106s
+db-daystride   daystride-mysql-cluster-1                                    0/2     Init:2/3            0          106s
+db-daystride   daystride-mysql-cluster-2                                    0/2     Init:0/3            0          112s
+db-daystride   daystride-mysql-cluster-2                                    0/2     Init:1/3            0          114s
+db-daystride   daystride-mysql-cluster-2                                    0/2     Init:1/3            0          115s
+db-daystride   daystride-mysql-cluster-2                                    0/2     Init:2/3            0          117s
+db-daystride   daystride-mysql-cluster-0                                    0/2     PodInitializing     0          2m
+db-daystride   daystride-mysql-cluster-1                                    0/2     PodInitializing     0          2m
+db-daystride   daystride-mysql-cluster-0                                    1/2     Running             0          2m1s
+db-daystride   daystride-mysql-cluster-1                                    1/2     Running             0          2m1s
+db-daystride   daystride-mysql-cluster-0                                    1/2     Running             0          2m2s
+db-daystride   daystride-mysql-cluster-0                                    1/2     Running             0          2m2s
+db-daystride   daystride-mysql-cluster-2                                    0/2     Init:2/3            0          2m2s
+db-daystride   daystride-mysql-cluster-1                                    1/2     Running             0          2m2s
+db-daystride   daystride-mysql-cluster-2                                    0/2     Init:2/3            0          2m2s
+db-daystride   daystride-mysql-cluster-1                                    1/2     Running             0          2m2s
+db-daystride   daystride-mysql-cluster-1                                    1/2     Running             0          2m2s
+db-daystride   daystride-mysql-cluster-0                                    1/2     Running             0          2m2s
+db-daystride   daystride-mysql-cluster-0                                    1/2     Running             0          2m5s
+db-daystride   daystride-mysql-cluster-1                                    1/2     Running             0          2m6s
+db-daystride   daystride-mysql-cluster-0                                    2/2     Running             0          2m11s
+db-daystride   daystride-mysql-cluster-1                                    2/2     Running             0          2m12s
+db-daystride   daystride-mysql-cluster-1                                    2/2     Running             0          2m12s
+db-daystride   daystride-mysql-cluster-0                                    2/2     Running             0          2m32s
+db-daystride   daystride-mysql-cluster-2                                    0/2     Init:2/3            0          2m32s
+db-daystride   daystride-mysql-cluster-1                                    2/2     Running             0          2m32s
+db-daystride   daystride-mysql-cluster-2                                    0/2     Init:2/3            0          2m32s
+db-daystride   daystride-mysql-cluster-1                                    2/2     Running             0          2m32s
+db-daystride   daystride-mysql-cluster-0                                    2/2     Running             0          2m32s
+db-daystride   daystride-mysql-cluster-0                                    2/2     Running             0          2m35s
+db-daystride   daystride-mysql-cluster-0                                    2/2     Running             0          2m35s
+db-daystride   daystride-mysql-cluster-0                                    2/2     Running             0          2m36s
+db-daystride   daystride-mysql-cluster-0                                    2/2     Running             0          2m36s
+db-daystride   daystride-mysql-cluster-0                                    2/2     Running             0          2m36s
+db-daystride   daystride-mysql-cluster-1                                    2/2     Running             0          2m42s
+db-daystride   daystride-mysql-cluster-1                                    2/2     Running             0          2m44s
+db-daystride   daystride-mysql-cluster-1                                    2/2     Running             0          2m49s
+db-daystride   daystride-mysql-cluster-1                                    2/2     Running             0          2m49s
+db-daystride   daystride-mysql-cluster-1                                    2/2     Running             0          2m49s
+db-daystride   daystride-mysql-cluster-1                                    2/2     Running             0          2m49s
+db-daystride   daystride-mysql-cluster-1                                    2/2     Running             0          2m50s
+db-daystride   daystride-mysql-cluster-2                                    0/2     Init:2/3            0          2m56s
+db-daystride   daystride-mysql-cluster-2                                    0/2     Init:2/3            0          3m2s
+db-daystride   daystride-mysql-cluster-2                                    0/2     Init:2/3            0          3m3s
+db-daystride   daystride-mysql-cluster-2                                    0/2     PodInitializing     0          3m6s
+db-daystride   daystride-mysql-cluster-2                                    1/2     Running             0          3m7s
+db-daystride   daystride-mysql-cluster-2                                    1/2     Running             0          3m8s
+db-daystride   daystride-mysql-cluster-2                                    1/2     Running             0          3m12s
+db-daystride   daystride-mysql-cluster-2                                    2/2     Running             0          3m17s
+db-daystride   daystride-mysql-cluster-2                                    2/2     Running             0          3m33s
+db-daystride   daystride-mysql-cluster-2                                    2/2     Running             0          3m34s
+db-daystride   daystride-mysql-cluster-2                                    2/2     Running             0          3m39s
+db-daystride   daystride-mysql-cluster-2                                    2/2     Running             0          3m39s
+db-daystride   daystride-mysql-cluster-2                                    2/2     Running             0          3m39s
+db-daystride   daystride-mysql-cluster-router-7f9c88c6cb-fsl8p              0/1     Pending             0          0s
+db-daystride   daystride-mysql-cluster-router-7f9c88c6cb-fsl8p              0/1     Pending             0          0s
+db-daystride   daystride-mysql-cluster-router-7f9c88c6cb-fsl8p              0/1     ContainerCreating   0          0s
+db-daystride   daystride-mysql-cluster-router-7f9c88c6cb-fsl8p              0/1     ContainerCreating   0          0s
+db-daystride   daystride-mysql-cluster-router-7f9c88c6cb-fsl8p              0/1     ContainerCreating   0          0s
+db-daystride   daystride-mysql-cluster-2                                    2/2     Running             0          3m39s
+db-daystride   daystride-mysql-cluster-2                                    2/2     Running             0          3m40s
+db-daystride   daystride-mysql-cluster-router-7f9c88c6cb-fsl8p              0/1     Running             0          25s
+db-daystride   daystride-mysql-cluster-router-7f9c88c6cb-fsl8p              1/1     Running             0          26s
+daystride      backend-deployment-58b66b97db-szjr5                          0/1     PodInitializing     0          6m
+daystride      backend-deployment-58b66b97db-596h9                          0/1     PodInitializing     0          6m
+daystride      backend-deployment-58b66b97db-gfkcs                          0/1     PodInitializing     0          6m
+daystride      backend-deployment-58b66b97db-kx77m                          0/1     PodInitializing     0          6m
+daystride      init-daystride-db-fskdg                                      0/1     Completed           0          6m2s
+daystride      backend-deployment-58b66b97db-dsrnk                          0/1     PodInitializing     0          6m1s
+daystride      init-daystride-db-fskdg                                      0/1     Completed           0          6m3s
+daystride      init-daystride-db-fskdg                                      0/1     Completed           0          6m4s
+daystride      backend-deployment-58b66b97db-kx77m                          1/1     Running             0          6m53s
+daystride      backend-deployment-58b66b97db-dsrnk                          1/1     Running             0          6m53s
+daystride      backend-deployment-58b66b97db-596h9                          1/1     Running             0          7m
+daystride      backend-deployment-58b66b97db-gfkcs                          1/1     Running             0          7m
+daystride      backend-deployment-58b66b97db-szjr5                          1/1     Running             0          7m
+

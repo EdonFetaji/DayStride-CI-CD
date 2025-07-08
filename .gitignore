@@ -1,2 +1,2 @@
 .*
-kubernetes/secrets.yaml
+kubernetes/*secrets.yaml

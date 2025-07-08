@@ -45,22 +45,25 @@ spec:
 
     spec:
       initContainers:
-        - name: wait-for-db
-          image: busybox
+        - name: wait-for-db-auth
+          image: mysql:8.4
           command:
             - /bin/sh
             - -c
             - |
-              echo "Waiting for DB to be available..."
-              until nc -z $DB_HOST $DB_PORT; do
-                echo "DB not ready, retrying in 5 seconds..."
-                sleep 5
+              echo "Checking DB readiness and user credentials at $DB_HOST:$DB_PORT..."
+              while true; do
+                if mysqladmin ping -h $DB_HOST -P $DB_PORT -u $DB_USER -p$DB_PASSWORD --silent; then
+                  echo "Login with user '$DB_USER' successful. Proceeding to start backend."
+                  exit 0
+                else
+                  echo "DB not ready or credentials invalid. Retrying in 5 seconds..."
+                  sleep 5
+                fi
               done
-              echo "DB is available, continuing."
           envFrom:
             - secretRef:
                 name: daystride-env-secret
-
       containers:
         - name: backend-container
           image: edon505/daystride-backend:latest

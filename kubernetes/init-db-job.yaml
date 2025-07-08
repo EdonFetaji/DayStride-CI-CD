@@ -1,0 +1,49 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-daystride-db
+  namespace: daystride
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: init-db
+        image: mysql:8.4
+        command: ["sh", "-c"]
+        args:
+          - |
+            echo "Waiting for DB to become available..."
+            until mysqladmin ping -h "$DB_HOST" -P "$DB_PORT" --silent; do
+              echo "DB not ready, waiting 5 seconds..."
+              sleep 5
+            done
+            echo "DB is ready, initializing..."
+            mysql -h $DB_HOST -P $DB_PORT -u root -p$DB_PASSWORD -e "
+              CREATE DATABASE IF NOT EXISTS $DB_NAME;
+              CREATE USER IF NOT EXISTS 'daystride_user'@'%' IDENTIFIED BY '$DB_PASSWORD';
+              GRANT ALL PRIVILEGES ON $DB_NAME.* TO 'daystride_user'@'%';
+              FLUSH PRIVILEGES;"
+            echo "Initialization complete."
+        env:
+        - name: DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: daystride-env-secret
+              key: DB_HOST
+        - name: DB_PORT
+          valueFrom:
+            secretKeyRef:
+              name: daystride-env-secret
+              key: DB_PORT
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: daystride-env-secret
+              key: DB_NAME
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: daystride-env-secret
+              key: DB_PASSWORD

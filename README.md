@@ -149,20 +149,49 @@ k3d cluster create daystride-cluster -s 1 -a 1 -p "80:80@loadbalancer" --api-por
 ## Applying Kubernetes Manifests
 Apply the Kubernetes manifests in the following order:
 
-- 1️. namespace.yaml
-- 2️. secrets.yaml
-- 3️. database.yaml
-- 4️. backend.yaml
-- 5️. frontend.yaml
-- 6️. ingress.yaml
-  
+1. db-namespace.yaml
+
+2. mysql-secrets.yaml
+
+3. Install mysql-operator (through helm)
+
+4. innodb-cluster.yaml
+
+5. init-db-job.yaml
+
+6. namespace.yaml
+
+7. secrets.yaml
+
+8. backend.yaml
+
+9. frontend.yaml
+
+10. ingress.yaml
+
+If helm (k8s packet manager) is uninstalled run:  
+```bash
+helm repo add mysql-operator https://mysql.github.io/mysql-operator/
+helm repo update
+```
+Copy the code to run the cluster Immediately:
 ``` bash
-kubectl apply -f kubernetes/namespace.yaml
-kubectl apply -f kubernetes/secrets.yaml
-kubectl apply -f kubernetes/database.yaml
-kubectl apply -f kubernetes/backend.yaml
-kubectl apply -f kubernetes/frontend.yaml
-kubectl apply -f kubernetes/ingress.yaml
+kubectl apply -f db-namespace.yaml
+kubectl apply -f mysql-secrets.yaml
+
+helm install mysql-operator mysql-operator/mysql-operator -n db-daystride
+
+kubectl apply -f innodb-cluster.yaml
+
+kubectl apply -f namespace.yaml
+kubectl apply -f secrets.yaml
+
+kubectl apply -f init-db-job.yaml
+
+kubectl apply -f backend.yaml
+kubectl apply -f frontend.yaml
+
+kubectl apply -f ingress.yaml
 ```
 After applying, the frontend will be accessible at:
 
